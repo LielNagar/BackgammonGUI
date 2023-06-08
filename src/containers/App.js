@@ -579,7 +579,7 @@ class App extends Component {
                 checkers: cell.count,
               };
             });
-            console.log(newPoints);
+            //console.log(newPoints);
             let newOutSideBar = {
               checkersP1: response.data.whitePlayerBank.count,
               checkersP2: response.data.blackPlayerBank.count,
