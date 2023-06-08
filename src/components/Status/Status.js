@@ -56,7 +56,7 @@ const Status = (props) => {
                 </div>
                 <div className="player-score-container">
                     <div className="player-score-name">
-                        <p>{props.players.p2}</p>
+                        <p>Backgammon Agent</p>
                     </div>
                     <div className="player-score-checker">
                         <Checker player={2} count={1} />

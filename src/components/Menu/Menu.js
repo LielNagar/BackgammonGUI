@@ -106,7 +106,7 @@ class Menu extends Component {
 
         content.body = <React.Fragment>
 
-            <label className="modal-body-t2">Player One: </label>
+            <label className="modal-body-t2">Player's Name: </label>
 
             <div className="input-group">
                 <input type="text"
@@ -114,25 +114,6 @@ class Menu extends Component {
                     value={players.p1}
                     onChange={this.changePlayerName.bind(this, 1)}
                 />
-                <div className="input-group-btn">
-                    <button className={'btn ' + p1Starts}
-                        onClick={this.changePlayerStart.bind(this, 1)}
-                    >starts</button>
-                </div>
-            </div>
-            <label className="modal-body-t2">Player Two: </label>
-
-            <div className="input-group">
-                <input type="text"
-                    className="form-control modal-body-t2"
-                    value={players.p2}
-                    onChange={this.changePlayerName.bind(this, 2)}
-                />
-                <div className="input-group-btn">
-                    <button className={'btn ' + p2Starts}
-                        onClick={this.changePlayerStart.bind(this, 2)}
-                    >starts</button>
-                </div>
             </div>
         </React.Fragment>
 
