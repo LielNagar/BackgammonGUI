@@ -50,7 +50,7 @@ class Menu extends Component {
 
         content.header = <p>Menu</p>;
 
-        content.body = <div className="modal-body-centralized">Backgammon by Bruno Nunes</div>
+        content.body = <div className="modal-body-centralized">Backgammon by Liel Nagar</div>
 
         content.footer = this.getRegularFooter();
 
@@ -253,12 +253,12 @@ class Menu extends Component {
     //Contents
     //About Body
     aboutBody = <div>
-        <p className="modal-body-t1">Backgammon by Bruno Nunes</p>
-        <p className="modal-body-t2">This game has been developed by Bruno Nunes,
-            a Web Developer and System Administrator in Vancouver, BC. He is a
-            graduate of the Applied Web Development and Applied Software Development programs at <a href="https://bcit.ca">BCIT</a>.<br /><br />
-            You can learn more about the author at <a href="https://brunonunes.ca">brunonunes.ca</a>.<br />
-            You can also access this project at <a href="https://github.com/bnunesc/react-backgammon">GitHub</a>.
+        <p className="modal-body-t1">Backgammon by Liel Nagar</p>
+        <p className="modal-body-t2">This game has been developed by Liel Nagar,
+            a Web Developer and a last year computer science student.
+            This project was done as a final product for a course on advanced algorithms for designing intelligent systems  
+            at <a href="https://www.ruppin.ac.il/Pages/hp.aspx">Ruppin</a> college.<br /><br />
+            You can also access this project at <a href="https://github.com/LielNagar/BackgammonGUI">GitHub</a>.
     </p>
     </div>
     //End About Body

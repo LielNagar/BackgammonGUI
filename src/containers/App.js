@@ -26,6 +26,35 @@ class App extends Component {
     showMenu: true,
   };
 
+  calculateScore = () => {
+    let scoreP1 = 0;
+    let scoreP2 = 0;
+
+    this.state.points.map((point, index) => {
+      if (point.player) {
+        //Check if the point belongs to a player
+
+        if (point.player === 1) {
+          //if player 1
+          scoreP1 += (24 - index) * point.checkers;
+        } else {
+          //If player 2
+          scoreP2 += (index + 1) * point.checkers;
+        }
+      }
+      return false;
+    });
+
+    //Score from grayBar
+    if (this.state.grayBar.checkersP1) {
+      scoreP1 += 25 * this.state.grayBar.checkersP1;
+    }
+    if (this.state.grayBar.checkersP2) {
+      scoreP2 += 25 * this.state.grayBar.checkersP2;
+    }
+
+    return { P1: scoreP1, P2: scoreP2 };
+  };
   //Toggle menu
   toggleMenuHandler = () => {
     this.setState({
@@ -141,6 +170,13 @@ class App extends Component {
       dice: dice,
       p1IsNext: p1IsNext,
     });
+    if (gameStatus == 50) {
+      alert("You have no available moves");
+      this.setState({
+        gameStatus: 30,
+      });
+      this.computerPlay(!p1IsNext);
+    }
   };
 
   //Calculate possible moves return an object with points and game status
@@ -214,7 +250,8 @@ class App extends Component {
         }
       }
     }
-    return { points: newPoints, gameStatus: gameStatus };
+    if(gameStatus == 50) this.handlePlayerNoMoves()
+    return { points: newPoints, gameStatus: 30 };
   };
 
   //Check if player has all the checkers in the home board
@@ -509,7 +546,11 @@ class App extends Component {
       movingChecker: movingChecker,
       showMenu: showMenu,
     });
-    this.computerPlay(p1IsNext);
+    if (gameStatus == 50) {
+      alert("here");
+      this.setState({ gameStatus: 30, p1IsNext: false });
+    }
+    this.computerPlay(this.state.p1IsNext);
   };
 
   computerPlay = (p1IsNext) => {
@@ -558,6 +599,9 @@ class App extends Component {
       board.BlackPlayerBank = BlackPlayerBank;
       board.WhitePlayerPrison = WhitePlayerPrison;
       board.BlackPlayerPrison = BlackPlayerPrison;
+      const score = this.calculateScore();
+      board.agentDestination = score.P2;
+      board.userDestination = score.P1;
 
       let requestModel = { board, dice };
 
@@ -568,18 +612,17 @@ class App extends Component {
             alert("Computer has no possible moves!");
             this.setState({
               p1IsNext: !p1IsNext,
-              dice:[0],
-              showComputerDice: false
-            })
-          }
-          else {
+              dice: [0],
+              showComputerDice: false,
+            });
+          } else {
             let newPoints = response.data.cells.map((cell) => {
               return {
                 player: cell.color == "W" ? 1 : cell.color == "B" ? 2 : false,
                 checkers: cell.count,
               };
             });
-            //console.log(newPoints);
+            console.log(newPoints);
             let newOutSideBar = {
               checkersP1: response.data.whitePlayerBank.count,
               checkersP2: response.data.blackPlayerBank.count,
@@ -634,6 +677,15 @@ class App extends Component {
       }
     }
     return movingChecker;
+  };
+
+  handlePlayerNoMoves = async () => {
+    alert('You have no available moves')
+    await this.setState({
+      player1IsNext: false,
+      gameStatus: 30,
+    });
+    this.computerPlay(this.state.player1IsNext);
   };
 
   undoHandler = () => {
@@ -722,6 +774,7 @@ class App extends Component {
           points={this.state.points}
           grayBar={this.state.grayBar}
           players={this.state.players}
+          calculateScore={this.calculateScore}
         />
         <div id="game">
           <Board
@@ -731,6 +784,7 @@ class App extends Component {
             points={this.state.points}
             p1IsNext={this.state.p1IsNext}
             gameStatus={this.state.gameStatus}
+            handlePlayerNoMoves={this.handlePlayerNoMoves}
             computerPlay={this.computerPlay}
           >
             <Graybar checkers={this.state.grayBar} />
