@@ -48,19 +48,19 @@ const OutSideBar = (props) => {
 
             <div className="blocksUp">
                 <div className="shadowBox"></div>
-                <div className={"pointContainer" + classReceivableP1}
-                    onClick={props.checkers.p1CanReceive}
+                <div className={"pointContainer" + classReceivableP2}
+                    onClick={props.checkers.p2CanReceive}
                 >
-                    {checkersP1}
+                    {checkersP2}
                 </div>
             </div>
 
             <div className="blocksDown">
                 <div className="shadowBox"></div>
-                <div className={"pointContainer pointContainerDown" + classReceivableP2}
-                    onClick={props.checkers.p2CanReceive}
+                <div className={"pointContainer pointContainerDown" + classReceivableP1}
+                    onClick={props.checkers.p1CanReceive}
                 >
-                    {checkersP2}
+                    {checkersP1}
                 </div>
             </div>
         </div>

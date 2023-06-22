@@ -600,8 +600,8 @@ class App extends Component {
       board.WhitePlayerPrison = WhitePlayerPrison;
       board.BlackPlayerPrison = BlackPlayerPrison;
       const score = this.calculateScore();
-      board.agentDestination = score.P2;
-      board.userDestination = score.P1;
+      board.AgentDestination = score.P2;
+      board.UserDestination = score.P1;
 
       let requestModel = { board, dice };
 
