@@ -250,7 +250,7 @@ class App extends Component {
         }
       }
     }
-    if(gameStatus == 50) this.handlePlayerNoMoves()
+    if (gameStatus == 50) this.handlePlayerNoMoves();
     return { points: newPoints, gameStatus: 30 };
   };
 
@@ -616,34 +616,111 @@ class App extends Component {
               showComputerDice: false,
             });
           } else {
-            let newPoints = response.data.cells.map((cell) => {
-              return {
-                player: cell.color == "W" ? 1 : cell.color == "B" ? 2 : false,
-                checkers: cell.count,
-              };
-            });
-            console.log(newPoints);
-            let newOutSideBar = {
-              checkersP1: response.data.whitePlayerBank.count,
-              checkersP2: response.data.blackPlayerBank.count,
-            };
-            console.log(newOutSideBar);
-            let newGrayBar = {
-              checkersP1: response.data.whitePlayerPrison.count,
-              checkersP2: response.data.blackPlayerPrison.count,
-            };
             setTimeout(() => {
-              this.setState({
-                points: newPoints,
-                grayBar: newGrayBar,
-                outSideBar: newOutSideBar,
-                p1IsNext: !p1IsNext,
-                dice: [0],
-                showComputerDice: false,
-              });
-            }, 2000);
+              this.iterateMoves(0, response.data, p1IsNext);
+            }, 1700);
+            // let newPoints = response.data.cells.map((cell) => {
+            //   return {
+            //     player: cell.color == "W" ? 1 : cell.color == "B" ? 2 : false,
+            //     checkers: cell.count,
+            //   };
+            // });
+            // console.log(newPoints);
+            // let newOutSideBar = {
+            //   checkersP1: response.data.whitePlayerBank.count,
+            //   checkersP2: response.data.blackPlayerBank.count,
+            // };
+            // console.log(newOutSideBar);
+            // let newGrayBar = {
+            //   checkersP1: response.data.whitePlayerPrison.count,
+            //   checkersP2: response.data.blackPlayerPrison.count,
+            // };
+            // setTimeout(() => {
+            //   this.setState({
+            //     points: newPoints,
+            //     grayBar: newGrayBar,
+            //     outSideBar: newOutSideBar,
+            // p1IsNext: !p1IsNext,
+            // dice: [0],
+            // showComputerDice: false,
+            //   });
+            // }, 2000);
           }
         });
+    }
+  };
+
+  iterateMoves = (index, data, p1IsNext) => {
+    console.log(data.checkerMoves);
+    let newOutSideBar = {
+      checkersP1: data.whitePlayerBank.count,
+      checkersP2: data.blackPlayerBank.count,
+    };
+    let newGrayBar = {
+      checkersP1: data.whitePlayerPrison.count,
+      checkersP2: data.blackPlayerPrison.count,
+    };
+    let newPoints = this.state.points;
+
+    if (data.checkerMoves[index].from != 25) {
+      // CASE AGENT ARE NOT EATEN
+      newPoints[data.checkerMoves[index].from].checkers--;
+
+      if (newPoints[data.checkerMoves[index].from].checkers == 0)
+        newPoints[data.checkerMoves[index].from].player = false;
+
+      if(data.checkerMoves[index].to != 27){
+        if (newPoints[data.checkerMoves[index].to].player == 1) {
+          newPoints[data.checkerMoves[index].to].player = 2;
+          newPoints[data.checkerMoves[index].to].checkers = 1;
+        } else {
+          newPoints[data.checkerMoves[index].to].checkers++;
+          newPoints[data.checkerMoves[index].to].player = 2;
+        }
+  
+        this.setState({
+          points: newPoints,
+        });
+      }
+      
+      if (index < data.checkerMoves.length - 1) {
+        setTimeout(() => {
+          this.iterateMoves(index + 1, data, p1IsNext);
+        }, 2000);
+      } else {
+        this.setState({
+          grayBar: newGrayBar,
+          outSideBar: newOutSideBar,
+          p1IsNext: !p1IsNext,
+          dice: [0],
+          showComputerDice: false,
+        });
+      }
+    } else {
+      // MEANS THAT WE ARE EATEN
+      if (newPoints[data.checkerMoves[index].to].player == 1) {
+        newPoints[data.checkerMoves[index].to].player = 2;
+        newPoints[data.checkerMoves[index].to].checkers = 1;
+      } else {
+        newPoints[data.checkerMoves[index].to].checkers++;
+        newPoints[data.checkerMoves[index].to].player = 2;
+      }
+      this.setState({
+        points: newPoints,
+      });
+      if (index < data.checkerMoves.length - 1) {
+        setTimeout(() => {
+          this.iterateMoves(index + 1, data);
+        }, 2000);
+      } else {
+        this.setState({
+          grayBar: newGrayBar,
+          outSideBar: newOutSideBar,
+          p1IsNext: !p1IsNext,
+          dice: [0],
+          showComputerDice: false,
+        });
+      }
     }
   };
 
@@ -680,7 +757,7 @@ class App extends Component {
   };
 
   handlePlayerNoMoves = async () => {
-    alert('You have no available moves')
+    alert("You have no available moves");
     await this.setState({
       player1IsNext: false,
       gameStatus: 30,
