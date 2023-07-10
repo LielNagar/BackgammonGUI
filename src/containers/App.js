@@ -171,11 +171,7 @@ class App extends Component {
       p1IsNext: p1IsNext,
     });
     if (gameStatus == 50) {
-      alert("You have no available moves");
-      this.setState({
-        gameStatus: 30,
-      });
-      this.computerPlay(!p1IsNext);
+      this.handlePlayerNoMoves();
     }
   };
 
@@ -250,8 +246,7 @@ class App extends Component {
         }
       }
     }
-    if (gameStatus == 50) this.handlePlayerNoMoves();
-    return { points: newPoints, gameStatus: 30 };
+    return { points: newPoints, gameStatus: gameStatus };
   };
 
   //Check if player has all the checkers in the home board
@@ -512,6 +507,10 @@ class App extends Component {
     //Change player if no die
     if (dice.length === 0) {
       dice[0] = 0;
+      if (grayBar.checkersP2 > 0 && this.isAgentClosed(points)) {
+        gameStatus = 777;
+        p1IsNext = !p1IsNext;
+      }
       p1IsNext = !p1IsNext;
       // p1IsNext = this.computerPlay(p1IsNext);
     } else {
@@ -547,10 +546,15 @@ class App extends Component {
       showMenu: showMenu,
     });
     if (gameStatus == 50) {
-      alert("here");
-      this.setState({ gameStatus: 30, p1IsNext: false });
+      this.handlePlayerNoMoves();
+    } else if (gameStatus !== 777) this.computerPlay(this.state.p1IsNext);
+  };
+
+  isAgentClosed = (points) => {
+    for (let i = 23; i >= 18; i--) {
+      if (!(points[i].checkers >= 2 && points[i].player == 1)) return false;
     }
-    this.computerPlay(this.state.p1IsNext);
+    return true;
   };
 
   computerPlay = (p1IsNext) => {
@@ -609,45 +613,29 @@ class App extends Component {
         .post(`https://localhost:7231/api/Boards`, requestModel)
         .then((response) => {
           if (response.data == "") {
-            alert("Computer has no possible moves!");
-            this.setState({
-              p1IsNext: !p1IsNext,
-              dice: [0],
-              showComputerDice: false,
-            });
+            this.handleComputerNoMoves(p1IsNext);
           } else {
             setTimeout(() => {
               this.iterateMoves(0, response.data, p1IsNext);
             }, 1700);
-            // let newPoints = response.data.cells.map((cell) => {
-            //   return {
-            //     player: cell.color == "W" ? 1 : cell.color == "B" ? 2 : false,
-            //     checkers: cell.count,
-            //   };
-            // });
-            // console.log(newPoints);
-            // let newOutSideBar = {
-            //   checkersP1: response.data.whitePlayerBank.count,
-            //   checkersP2: response.data.blackPlayerBank.count,
-            // };
-            // console.log(newOutSideBar);
-            // let newGrayBar = {
-            //   checkersP1: response.data.whitePlayerPrison.count,
-            //   checkersP2: response.data.blackPlayerPrison.count,
-            // };
-            // setTimeout(() => {
-            //   this.setState({
-            //     points: newPoints,
-            //     grayBar: newGrayBar,
-            //     outSideBar: newOutSideBar,
-            // p1IsNext: !p1IsNext,
-            // dice: [0],
-            // showComputerDice: false,
-            //   });
-            // }, 2000);
           }
         });
     }
+  };
+
+  handleComputerNoMoves = () => {
+    this.setState({
+      gameStatus: 50,
+      p1IsNext: false,
+    });
+    setTimeout(() => {
+      this.setState({
+        gameStatus: 30,
+        p1IsNext: true,
+        dice: [0],
+        showComputerDice: false,
+      });
+    }, 2500);
   };
 
   iterateMoves = (index, data, p1IsNext) => {
@@ -669,7 +657,7 @@ class App extends Component {
       if (newPoints[data.checkerMoves[index].from].checkers == 0)
         newPoints[data.checkerMoves[index].from].player = false;
 
-      if(data.checkerMoves[index].to != 27){
+      if (data.checkerMoves[index].to != 27) {
         if (newPoints[data.checkerMoves[index].to].player == 1) {
           newPoints[data.checkerMoves[index].to].player = 2;
           newPoints[data.checkerMoves[index].to].checkers = 1;
@@ -677,12 +665,12 @@ class App extends Component {
           newPoints[data.checkerMoves[index].to].checkers++;
           newPoints[data.checkerMoves[index].to].player = 2;
         }
-  
+
         this.setState({
           points: newPoints,
         });
       }
-      
+
       if (index < data.checkerMoves.length - 1) {
         setTimeout(() => {
           this.iterateMoves(index + 1, data, p1IsNext);
@@ -757,12 +745,15 @@ class App extends Component {
   };
 
   handlePlayerNoMoves = async () => {
-    alert("You have no available moves");
-    await this.setState({
-      player1IsNext: false,
-      gameStatus: 30,
-    });
-    this.computerPlay(this.state.player1IsNext);
+    setTimeout(() => {
+      this.setState({
+        gameStatus: 30,
+        p1IsNext: false,
+      });
+    }, 2500);
+    setTimeout(() => {
+      this.computerPlay(false);
+    }, 2500);
   };
 
   undoHandler = () => {
@@ -861,8 +852,6 @@ class App extends Component {
             points={this.state.points}
             p1IsNext={this.state.p1IsNext}
             gameStatus={this.state.gameStatus}
-            handlePlayerNoMoves={this.handlePlayerNoMoves}
-            computerPlay={this.computerPlay}
           >
             <Graybar checkers={this.state.grayBar} />
             <OutSideBar
