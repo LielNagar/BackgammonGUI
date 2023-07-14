@@ -6,8 +6,6 @@ import './Status.css';
 const Status = (props) => {
 
     //Calculate score
-    
-
     const score = props.calculateScore();
 
     return (
