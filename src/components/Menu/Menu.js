@@ -1,275 +1,307 @@
-import React, { Component } from 'react';
-import './Menu.css';
-
+import React, { Component } from "react";
+import "./Menu.css";
 
 class Menu extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    const content = this.getContent(this.props.gameStatus, this.props.players);
 
-        const content = this.getContent(this.props.gameStatus, this.props.players);
+    //Set initial state
+    this.state = {
+      header: content.header,
+      body: content.body,
+      footer: content.footer,
+      menuWidth: content.width,
+      canClose: content.canClose,
+      playerNames: { p1: this.props.players.p1, p2: this.props.players.p2 },
+      playerStarts: 1,
+    };
+  }
 
-        //Set initial state
-        this.state = {
-            header: content.header,
-            body: content.body,
-            footer: content.footer,
-            menuWidth: content.width,
-            canClose: content.canClose,
-            playerNames: { p1: this.props.players.p1, p2: this.props.players.p2 },
-            playerStarts: 1,
-        }
+  //Get the content for the initial state
+  getContent(gameStatus, players) {
+    console.log("render");
+    let content = null;
+
+    //Functions return an object;
+    switch (gameStatus) {
+      //60 or 70 player won
+      case 60:
+        content = this.getWinner(gameStatus, players);
+        break;
+      case 70:
+        content = this.getWinner(gameStatus, players);
+        break;
+      default:
+        content = this.getMenu(gameStatus, players);
+        break;
     }
+    return content;
+  }
 
+  //Get regular menu
+  getMenu = (gameStatus, players) => {
+    const content = {};
 
-    //Get the content for the initial state
-    getContent(gameStatus, players) {
+    content.header = <p>Menu</p>;
 
-        let content = null;
+    content.body = (
+      <div className="modal-body-centralized">Backgammon by Liel Nagar</div>
+    );
 
-        //Functions return an object;
-        switch (gameStatus) {
-            //60 or 70 player won
-            case 60:
-                content = this.getWinner(gameStatus, players);
-                break;
-            case 70:
-                content = this.getWinner(gameStatus, players);
-                break;
-            default:
-                content = this.getMenu(gameStatus, players);
-                break;
-        }
-        return content;
-    }
+    content.footer = this.getRegularFooter();
 
-    //Get regular menu
-    getMenu = (gameStatus, players) => {
+    content.width = "menu-small";
+    content.canClose = gameStatus !== 80 ? true : false;
 
-        const content = {};
+    return content;
+  };
 
-        content.header = <p>Menu</p>;
+  //Get winning message
+  getWinner(gameStatus, players) {
+    const content = {};
 
-        content.body = <div className="modal-body-centralized">Backgammon by Liel Nagar</div>
+    content.header = (
+      <p>
+        <br />
+      </p>
+    );
 
-        content.footer = this.getRegularFooter();
+    content.body = (
+      <React.Fragment>
+        <img src="./assets/congratulation.png" alt="congratulation" />
+        <p className="modal-body-centralized">
+          {gameStatus === 60
+            ? players.p1 + "wins!"
+            : gameStatus === 70
+            ? "My agent won you! \n How about next time?"
+            : null}
+        </p>
+      </React.Fragment>
+    );
 
-        content.width = 'menu-small';
-        content.canClose = gameStatus !== 80 ? true : false;
+    content.footer = this.getRegularFooter();
 
-        return content;
-    }
+    content.width = "menu-small";
+    content.canClose = true;
 
-    //Get winning message
-    getWinner(gameStatus, players) {
-        const content = {};
+    return content;
+  }
 
-        content.header = <p><br /></p>;
+  //Get regular footer
+  getRegularFooter = () => {
+    const alertNewGame = this.props.gameStatus < 60 ? 12 : 11; //12 shows alert
 
-        content.body = <React.Fragment>
-            <img src="./assets/congratulation.png" alt="congratulation" />
-            <p className="modal-body-centralized">{gameStatus === 60 ? players.p1 : players.p2} wins!</p>
-        </React.Fragment>
+    return (
+      <React.Fragment>
+        {this.aboutButton}
 
-        content.footer = this.getRegularFooter();
-
-        content.width = 'menu-small';
-        content.canClose = true;
-
-        return content;
-    }
-
-    //Get regular footer
-    getRegularFooter = () => {
-
-        const alertNewGame = this.props.gameStatus < 60 ? 12 : 11; //12 shows alert
-
-        return <React.Fragment>
-            {this.aboutButton}
-
-            <button
-                className="btn btn-success"
-                onClick={this.newGameHandler.bind(this, alertNewGame)}>New Game
+        <button
+          className="btn btn-success"
+          onClick={this.newGameHandler.bind(this, alertNewGame)}
+        >
+          New Game
         </button>
-        </React.Fragment>;
+      </React.Fragment>
+    );
+  };
+
+  //Get a new game
+  getNewGame = (gameStatus, players, playerStarts) => {
+    const content = {};
+
+    content.header = <p>New Game</p>;
+
+    content.body = (
+      <React.Fragment>
+        <label className="modal-body-t2">Player's Name: </label>
+
+        <div className="input-group">
+          <input
+            type="text"
+            className="form-control modal-body-t2"
+            value={players.p1}
+            onChange={this.changePlayerName.bind(this, 1)}
+          />
+        </div>
+      </React.Fragment>
+    );
+
+    content.footer = (
+      <React.Fragment>
+        {this.aboutButton}
+
+        <button
+          className="btn btn-success"
+          onClick={this.props.newGameHandler.bind(this, players, playerStarts)}
+        >
+          New Game
+        </button>
+      </React.Fragment>
+    );
+
+    content.width = "menu-small";
+    content.canClose = gameStatus !== 80 ? true : false;
+
+    return content;
+  };
+
+  //Change the player who starts the game
+  changePlayerStart = (playerStarts) => {
+    const content = this.getNewGame(11, this.state.playerNames, playerStarts);
+
+    this.setState({
+      body: content.body,
+      footer: content.footer,
+      playerStarts: playerStarts,
+    });
+  };
+
+  //Change the player name
+  changePlayerName = (player, event) => {
+    const playerNames = { ...this.state.playerNames };
+
+    if (event.target.value.length <= 12) {
+      if (player === 1) {
+        playerNames.p1 = event.target.value;
+      } else {
+        playerNames.p2 = event.target.value;
+      }
     }
 
-    //Get a new game
-    getNewGame = (gameStatus, players, playerStarts) => {
-        const content = {};
+    const content = this.getNewGame(11, playerNames, this.state.playerStarts);
 
-        const p1Starts = playerStarts === 1 ? 'btn-info' : 'btn-default';
-        const p2Starts = playerStarts === 2 ? 'btn-info' : 'btn-default';
+    this.setState({
+      body: content.body,
+      footer: content.footer,
+      playerNames: playerNames,
+    });
+  };
 
+  //Start a new game
+  newGameHandler = (newGameStatus) => {
+    const content = this.getNewGame(
+      11,
+      this.state.playerNames,
+      this.state.playerStarts
+    );
+    console.log("Starting a new game");
 
-        content.header = <p>New Game</p>;
-
-        content.body = <React.Fragment>
-
-            <label className="modal-body-t2">Player's Name: </label>
-
-            <div className="input-group">
-                <input type="text"
-                    className="form-control modal-body-t2"
-                    value={players.p1}
-                    onChange={this.changePlayerName.bind(this, 1)}
-                />
-            </div>
+    if (newGameStatus === 12) {
+      content.body = (
+        <React.Fragment>
+          <p className="modal-body-t1 modal-body-centralized">
+            Are you sure you want to end the current game?
+          </p>
         </React.Fragment>
+      );
 
-        content.footer = <React.Fragment>
-            {this.aboutButton}
-
-            <button
-                className="btn btn-success"
-                onClick={this.props.newGameHandler.bind(this, players, playerStarts)}>New Game
-            </button>
-        </React.Fragment>;
-
-        content.width = 'menu-small';
-        content.canClose = gameStatus !== 80 ? true : false;
-
-        return content;
+      content.footer = (
+        <React.Fragment>
+          {this.aboutButton}
+          <button
+            className="btn btn-danger"
+            onClick={this.newGameHandler.bind(this, 11)}
+          >
+            New Game
+          </button>
+        </React.Fragment>
+      );
     }
 
-    //Change the player who starts the game
-    changePlayerStart = (playerStarts) => {
+    this.setState({
+      header: content.header,
+      body: content.body,
+      footer: content.footer,
+      menuWidth: content.width,
+      canClose: content.canClose,
+    });
+  };
 
-        const content = this.getNewGame(11, this.state.playerNames, playerStarts);
+  //Show/Hide the about menu
+  toggleAboutHandler = (show) => {
+    let content = {};
 
-        this.setState({
-            body: content.body,
-            footer: content.footer,
-            playerStarts: playerStarts,
-        });
+    if (show) {
+      //show About
+      content.header = <p>About</p>;
+      content.body = <React.Fragment>{this.aboutBody}</React.Fragment>;
 
+      content.footer = (
+        <button
+          className="btn btn-danger"
+          onClick={this.toggleAboutHandler.bind(this, false)}
+        >
+          Close
+        </button>
+      );
+
+      content.width = "menu-big";
+      content.canClose = false;
+    } else {
+      //Close About
+      content = this.getContent(this.props.gameStatus, this.props.players);
     }
 
-    //Change the player name
-    changePlayerName = (player, event) => {
+    this.setState({
+      header: content.header,
+      body: content.body,
+      footer: content.footer,
+      menuWidth: content.width,
+      canClose: content.canClose,
+    });
+  };
 
-        const playerNames = { ...this.state.playerNames };
+  render() {
+    return (
+      <div id="modal">
+        <div id="modal-content" className={this.state.menuWidth}>
+          <div id="modal-header">
+            {this.state.canClose ? (
+              <div id="modal-close" onClick={this.props.toggleMenuHandler}>
+                X
+              </div>
+            ) : null}
+            {this.state.header}
+          </div>
+          <div id="modal-body">{this.state.body}</div>
+          <div id="modal-footer">{this.state.footer}</div>
+        </div>
+      </div>
+    );
+  }
 
-        if (event.target.value.length <= 12) {
-            if (player === 1) {
-                playerNames.p1 = event.target.value;
-            } else {
-                playerNames.p2 = event.target.value;
-            }
-        }
-
-        const content = this.getNewGame(11, playerNames, this.state.playerStarts);
-
-        this.setState({
-            body: content.body,
-            footer: content.footer,
-            playerNames: playerNames,
-        });
-    }
-
-    //Start a new game
-    newGameHandler = (newGameStatus) => {
-
-        const content = this.getNewGame(11, this.state.playerNames, this.state.playerStarts);
-        console.log('Starting a new game');
-
-        if (newGameStatus === 12) {
-
-            content.body =
-                <React.Fragment>
-                    <p className="modal-body-t1 modal-body-centralized">Are you sure you want to end the current game?</p>
-                </React.Fragment>
-
-            content.footer = <React.Fragment>
-                {this.aboutButton}
-                <button
-                    className="btn btn-danger"
-                    onClick={this.newGameHandler.bind(this, 11)}>New Game
-                    </button>
-            </React.Fragment>;
-        }
-
-        this.setState({
-            header: content.header,
-            body: content.body,
-            footer: content.footer,
-            menuWidth: content.width,
-            canClose: content.canClose,
-        });
-
-    }
-
-    //Show/Hide the about menu
-    toggleAboutHandler = (show) => {
-
-        let content = {};
-
-        if (show) { //show About
-            content.header = <p>About</p>;
-            content.body = <React.Fragment>
-                {this.aboutBody}
-            </React.Fragment>
-
-            content.footer = <button className="btn btn-danger" onClick={this.toggleAboutHandler.bind(this, false)}>Close</button>
-
-            content.width = 'menu-big';
-            content.canClose = false;
-        }
-        else { //Close About
-            content = this.getContent(this.props.gameStatus, this.props.players);
-        }
-
-        this.setState({
-            header: content.header,
-            body: content.body,
-            footer: content.footer,
-            menuWidth: content.width,
-            canClose: content.canClose,
-        });
-    }
-
-    render() {
-
-        return (
-            <div id="modal" >
-
-                <div id="modal-content" className={this.state.menuWidth}>
-                    <div id="modal-header">
-                        {this.state.canClose ? <div id="modal-close" onClick={this.props.toggleMenuHandler}>X</div> : null}
-                        {this.state.header}
-                    </div>
-                    <div id="modal-body">
-                        {this.state.body}
-                    </div>
-                    <div id="modal-footer">
-                        {this.state.footer}
-                    </div>
-                </div>
-
-            </div>
-        );
-    }
-
-    //Contents
-    //About Body
-    aboutBody = <div>
-        <p className="modal-body-t1">Backgammon by Liel Nagar</p>
-        <p className="modal-body-t2">This game has been developed by Liel Nagar,
-            a Web Developer and a last year computer science student.
-            This project was done as a final product for a course on advanced algorithms for designing intelligent systems  
-            at <a href="https://www.ruppin.ac.il/Pages/hp.aspx">Ruppin</a> college.<br /><br />
-            You can also access this project at <a href="https://github.com/LielNagar/BackgammonGUI">GitHub</a>.
-    </p>
+  //Contents
+  //About Body
+  aboutBody = (
+    <div>
+      <p className="modal-body-t1">Backgammon by Liel Nagar</p>
+      <p className="modal-body-t2">
+        This game has been developed by Liel Nagar, a Web Developer and a last
+        year computer science student. This project was done as a final product
+        for a course on advanced algorithms for designing intelligent systems at{" "}
+        <a href="https://www.ruppin.ac.il/Pages/hp.aspx">Ruppin</a> college.
+        <br />
+        <br />
+        You can also access this project at{" "}
+        <a href="https://github.com/LielNagar/BackgammonGUI">GitHub</a>.
+      </p>
     </div>
-    //End About Body
+  );
+  //End About Body
 
-    //About button
-    aboutButton = <button id="modal-about" className="btn btn-info"
-        onClick={this.toggleAboutHandler.bind(this, true)}>
-        About
+  //About button
+  aboutButton = (
+    <button
+      id="modal-about"
+      className="btn btn-info"
+      onClick={this.toggleAboutHandler.bind(this, true)}
+    >
+      About
     </button>
-    //End about button
-
+  );
+  //End about button
 }
 
 export default Menu;

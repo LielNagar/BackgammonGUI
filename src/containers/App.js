@@ -676,13 +676,25 @@ class App extends Component {
           this.iterateMoves(index + 1, data, p1IsNext);
         }, 2000);
       } else {
-        this.setState({
-          grayBar: newGrayBar,
-          outSideBar: newOutSideBar,
-          p1IsNext: !p1IsNext,
-          dice: [0],
-          showComputerDice: false,
-        });
+        const score = this.calculateScore();
+        if (score.P2 === 0)
+          this.setState({
+            grayBar: newGrayBar,
+            outSideBar: newOutSideBar,
+            p1IsNext: !p1IsNext,
+            showMenu: true,
+            gameStatus: 70,
+            dice: [0],
+            showComputerDice: false,
+          });
+          else
+          this.setState({
+            grayBar: newGrayBar,
+            outSideBar: newOutSideBar,
+            p1IsNext: !p1IsNext,
+            dice: [0],
+            showComputerDice: false,
+          });
       }
     } else {
       // MEANS THAT WE ARE EATEN
@@ -701,13 +713,25 @@ class App extends Component {
           this.iterateMoves(index + 1, data);
         }, 2000);
       } else {
-        this.setState({
-          grayBar: newGrayBar,
-          outSideBar: newOutSideBar,
-          p1IsNext: !p1IsNext,
-          dice: [0],
-          showComputerDice: false,
-        });
+        const score = this.calculateScore();
+        if (score.P2 === 0)
+          this.setState({
+            grayBar: newGrayBar,
+            outSideBar: newOutSideBar,
+            p1IsNext: !p1IsNext,
+            gameStatus: 70,
+            showMenu: true,
+            dice: [0],
+            showComputerDice: false,
+          });
+          else
+          this.setState({
+            grayBar: newGrayBar,
+            outSideBar: newOutSideBar,
+            p1IsNext: !p1IsNext,
+            dice: [0],
+            showComputerDice: false,
+          });
       }
     }
   };
