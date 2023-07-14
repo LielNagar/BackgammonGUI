@@ -610,7 +610,7 @@ class App extends Component {
       let requestModel = { board, dice };
 
       axios
-        .post(`/cgroup2/test2/tar6/api/Posts/`, requestModel)
+        .post(`https://localhost:7231/api/Boards`, requestModel)
         .then((response) => {
           if (response.data == "") {
             this.handleComputerNoMoves(p1IsNext);
